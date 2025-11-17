@@ -11,10 +11,8 @@
  user {
     id bigint
     username varchar(50)
-    password string
     team_name string
     is_active boolean
-    is_admin active
  }
  team {
     id bigint
@@ -25,6 +23,8 @@
     name varchar(50)
     status varchar(50)
     created_by bigint
+    created_at timestamp
+    merged_at timestamp
  }
  reviewer {
    id bigint
