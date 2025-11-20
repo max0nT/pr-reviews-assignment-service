@@ -12,3 +12,9 @@ run:
 migrate-run *args:
     echo $POSTGRES_URI
     @migrate -path ./migrations -database $POSTGRES_URI {{args}}
+
+lint:
+    golangci-lint run
+fmt:
+    golangci-lint fmt
+

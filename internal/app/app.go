@@ -23,16 +23,16 @@ func Run(cfg *config.Config) {
 	// Init http server
 	httpServer := httpserver.New(l)
 
-	httpServer.App.Run()
+	httpServer.App.Run() // nolint: errcheck, gosec
 
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 	select {
-		case s := <-interrupt:
-			l.Info("app - Run - signal: %s", s.String())
-		case err = <- httpServer.Notify():
-			l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
+	case s := <-interrupt:
+		l.Info("app - Run - signal: %s", s.String())
+	case err = <-httpServer.Notify():
+		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
 	}
 
 	// Shutdown
@@ -40,6 +40,5 @@ func Run(cfg *config.Config) {
 	if err != nil {
 		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
 	}
-
 
 }

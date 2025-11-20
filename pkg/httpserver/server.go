@@ -4,18 +4,11 @@ package httpserver
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/max0nT/pr-assign/pkg/logger"
 	"golang.org/x/sync/errgroup"
-)
 
-const (
-	_defaultAddr            = ":80"
-	_defaultReadTimeout     = 5 * time.Second
-	_defaultWriteTimeout    = 5 * time.Second
-	_defaultShutdownTimeout = 3 * time.Second
+	"github.com/max0nT/pr-assign/pkg/logger"
 )
 
 // Server -.
@@ -26,7 +19,6 @@ type Server struct {
 	App    *gin.Engine
 	notify chan error
 
-
 	logger logger.Interface
 }
 
@@ -36,11 +28,11 @@ func New(l logger.Interface) *Server {
 	group.SetLimit(1) // Run only one goroutine
 
 	s := &Server{
-		ctx:             ctx,
-		eg:              group,
-		App:             nil,
-		notify:          make(chan error, 1),
-		logger:          l,
+		ctx:    ctx,
+		eg:     group,
+		App:    nil,
+		notify: make(chan error, 1),
+		logger: l,
 	}
 
 	app := gin.Default()

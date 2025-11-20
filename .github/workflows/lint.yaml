@@ -1,0 +1,22 @@
+name: Run linters
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@main
+
+      # Since that actions makes lint run implicitly there aren't necessary
+      # to make a separated step
+      # For Example https://github.com/max0nT/pr-reviews-assignment-service/actions/runs/19529270485/job/55908266130
+      - name: Install golintci
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.6

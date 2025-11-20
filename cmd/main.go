@@ -7,7 +7,6 @@ import (
 	"github.com/max0nT/pr-assign/internal/app"
 )
 
-
 func main() {
 	// Configuration
 	cfg, err := config.NewConfig()
