@@ -28,8 +28,8 @@
  }
  reviewer {
    id varchar(50)
-   reviewer_id bigint
-   pr_id bigint
+   reviewer_id varchar(50)
+   pr_id varchar(50)
  }
 
 ```
