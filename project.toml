@@ -1,0 +1,12 @@
+[_]
+schema-version="0.2"
+
+[io.buildpacks]
+exclude = [
+    "*_test.go",
+    "README.md",
+    "migrations"
+]
+[[ io.buildpacks.build.env ]]
+  name="BP_KEEP_FILES"
+  value=".env"

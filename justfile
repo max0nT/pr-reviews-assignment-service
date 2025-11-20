@@ -14,7 +14,11 @@ migrate-run *args:
     @migrate -path ./migrations -database $POSTGRES_URI {{args}}
 
 lint:
-    golangci-lint run
+    @golangci-lint run
 fmt:
-    golangci-lint fmt
+    @golangci-lint fmt
 
+docker-build:
+	@pack build maxtet1703/pr-assignment-service \
+	 --builder paketobuildpacks/builder-jammy-buildpackless-static \
+	 --buildpack paketo-buildpacks/go
