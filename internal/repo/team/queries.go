@@ -8,6 +8,8 @@ import (
 )
 
 func (repo *ItemRepository) InsertTeam(
+	ctx context.Context,
+	tx *pgx.Tx,
 	teamName string,
 ) (res entities.ItemSimple, err error) {
 	queryBuild := repo.Cfg.Builder.Insert("teams").
@@ -21,27 +23,12 @@ func (repo *ItemRepository) InsertTeam(
 		return
 	}
 
-	tx, err := repo.Cfg.Pool.BeginTx(
-		context.Background(),
-		pgx.TxOptions{
-			IsoLevel: pgx.RepeatableRead,
-		},
-	)
-	if err != nil {
-		return
-	}
-
-	resRaw := tx.QueryRow(context.Background(), queryString, args...)
+	resRaw := (*tx).QueryRow(ctx, queryString, args...)
 
 	err = resRaw.Scan(
 		&res.Id,
 		&res.Name,
 	)
-	if err != nil {
-		tx.Rollback(context.Background()) // nolint: errcheck, gosec
-		return
-	}
-	tx.Commit(context.Background()) //nolint: errcheck, gosec
 
 	return
 }

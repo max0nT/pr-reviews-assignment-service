@@ -27,6 +27,7 @@ func Run(cfg *config.Config) {
 	defer pg.Close()
 
 	teamManage := teammanage.New(
+		pg,
 		userrepo.New(pg),
 		teamrepo.New(pg),
 	)

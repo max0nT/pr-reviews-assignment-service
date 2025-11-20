@@ -1,6 +1,7 @@
 package teammanage
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,8 +13,18 @@ import (
 func (tm *TeamManage) AddTeam(
 	teamData entities.ItemCreate,
 ) (res entities.ItemRead, err error) {
-	insertedTeam, err := tm.TeamRepo.InsertTeam(teamData.Name)
+	ctx := context.Background()
+	tx, err := tm.Cfg.Pool.BeginTx(ctx, pgx.TxOptions{
+		IsoLevel: pgx.ReadCommitted,
+	})
 	if err != nil {
+		tx.Rollback(ctx) // nolint: errcheck, gosec
+		return
+	}
+
+	insertedTeam, err := tm.TeamRepo.InsertTeam(ctx, &tx, teamData.Name)
+	if err != nil {
+		tx.Rollback(ctx) // nolint: errcheck, gosec
 		if errors.Is(err, pgx.ErrNoRows) {
 			err = &entities.RequestError{
 				Msg: fmt.Sprintf(
@@ -27,10 +38,13 @@ func (tm *TeamManage) AddTeam(
 	}
 
 	insertedUsers, err := tm.UserRepo.InsertUsers(
+		ctx,
+		&tx,
 		teamData.Users,
 		insertedTeam.Name,
 	)
 	if err != nil {
+		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -38,5 +52,6 @@ func (tm *TeamManage) AddTeam(
 	res.Name = insertedTeam.Name
 	res.Users = insertedUsers
 
+	tx.Commit(ctx) // nolint: errcheck, gosec
 	return
 }

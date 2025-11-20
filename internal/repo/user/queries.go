@@ -8,6 +8,8 @@ import (
 )
 
 func (repo *UserRepository) InsertUsers(
+	ctx context.Context,
+	tx *pgx.Tx,
 	users []entities.User,
 	teamName string,
 ) (res []entities.User, err error) {
@@ -35,23 +37,12 @@ func (repo *UserRepository) InsertUsers(
 		return
 	}
 
-	tx, err := repo.Cfg.Pool.BeginTx(
-		context.Background(),
-		pgx.TxOptions{
-			IsoLevel: pgx.RepeatableRead,
-		},
-	)
-	if err != nil {
-		return
-	}
-
-	rawRes, err := tx.Query(
-		context.Background(),
+	rawRes, err := (*tx).Query(
+		ctx,
 		queryString,
 		args...,
 	)
 	if err != nil {
-		tx.Rollback(context.Background()) // nolint: errcheck, gosec
 		return
 	}
 
@@ -65,13 +56,11 @@ func (repo *UserRepository) InsertUsers(
 			&userData.IsActive,
 		)
 		if err != nil {
-			tx.Rollback(context.Background()) // nolint: errcheck, gosec
 			return
 		}
 		res = append(res, userData)
 	}
 
 	rawRes.Close()
-	tx.Commit(context.Background()) // nolint: errcheck, gosec
 	return
 }
