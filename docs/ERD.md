@@ -9,17 +9,17 @@
    reviewer o{--|| pull_request: "assigned to"
 
  user {
-    id bigint
+    id varchar(50)
     username varchar(50)
     team_name string
     is_active boolean
  }
  team {
-    id bigint
+    id varchar(50)
     name string
  }
  pull_request {
-    id bigint
+    id varchar(50)
     name varchar(50)
     status varchar(50)
     created_by bigint
@@ -27,7 +27,7 @@
     merged_at timestamp
  }
  reviewer {
-   id bigint
+   id varchar(50)
    reviewer_id bigint
    pr_id bigint
  }
