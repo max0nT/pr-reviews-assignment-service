@@ -6,6 +6,12 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/max0nT/pr-assign/internal/controllers"
+	teamrepo "github.com/max0nT/pr-assign/internal/repo/team"
+	userrepo "github.com/max0nT/pr-assign/internal/repo/user"
+	teammanage "github.com/max0nT/pr-assign/internal/usecase/team_manage"
+
 	"github.com/max0nT/pr-assign/config"
 	"github.com/max0nT/pr-assign/pkg/httpserver"
 	"github.com/max0nT/pr-assign/pkg/logger"
@@ -20,8 +26,16 @@ func Run(cfg *config.Config) {
 	}
 	defer pg.Close()
 
+	teamManage := teammanage.New(
+		userrepo.New(pg),
+		teamrepo.New(pg),
+	)
+	cnt := controllers.New(teamManage, validator.New())
+
 	// Init http server
 	httpServer := httpserver.New(l)
+	group := httpServer.App.Group("/api/v1/")
+	group.POST("team/add/", cnt.AddTeam)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 

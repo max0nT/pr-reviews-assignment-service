@@ -3,7 +3,7 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	PostgresUri string `env:"POSTGRES_URI,required"`
+	PostgresUri string `mapstructure:"POSTGRES_URI"`
 }
 
 func NewConfig() (cfg *Config, err error) {
