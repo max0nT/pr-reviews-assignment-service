@@ -56,6 +56,7 @@ func Run(cfg *config.Config) {
 	// Pr manage
 	group.POST("pr/open/", cnt.OpenPr)
 	group.PATCH("pr/merge/", cnt.MergePr)
+	group.PATCH("pr/reassign/", cnt.ReassignReviewer)
 
 	// User manage
 	group.PATCH("user/change-status-active/", cnt.ChangeUserActive)

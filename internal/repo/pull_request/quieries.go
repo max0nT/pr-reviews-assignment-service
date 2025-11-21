@@ -67,6 +67,119 @@ func (repo *PrRepository) MergePr(
 	return
 }
 
+func (repo *PrRepository) SelectPr(
+	ctx context.Context,
+	tx *pgx.Tx,
+	prData *entities.PrParams,
+) (res []entities.PrSimple, err error) {
+	queryBuilder := repo.Cfg.Builder.Select("*").From("pull_requests")
+	if prData.PrId != "" {
+		queryBuilder = queryBuilder.Where(sq.Eq{"id": prData.PrId})
+	}
+	if prData.CreatedBy != "" {
+		queryBuilder = queryBuilder.Where(
+			sq.Eq{"created_by_id": prData.CreatedBy},
+		)
+	}
+	if prData.IsMerged {
+		queryBuilder = queryBuilder.Where(sq.Eq{"is_merged": prData.IsMerged})
+	}
+	queryBuilder = queryBuilder.Join(
+		"users ON pull_requests.created_by_id = users.id",
+	)
+
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes, err := (*tx).Query(ctx, queryString, args...)
+	if err != nil {
+		return
+	}
+
+	for rawRes.Next() {
+		var prData entities.PrSimple
+
+		err = rawRes.Scan(
+			&prData.PrId,
+			&prData.PrName,
+			&prData.IsMerged,
+			&prData.CreatedBy,
+			&prData.CreatedAt,
+			&prData.MergedAt,
+			&prData.CreatedByData.Id,
+			&prData.CreatedByData.Username,
+			&prData.CreatedByData.TeamName,
+			&prData.CreatedByData.IsActive,
+		)
+		if err != nil {
+			return
+		}
+
+		res = append(res, prData)
+	}
+
+	rawRes.Close()
+	return
+}
+
+func (repo *PrRepository) SelectReviewer(
+	ctx context.Context,
+	tx *pgx.Tx,
+	reviewerData entities.PrReviewerParams,
+) (res []entities.PrReviewer, err error) {
+	queryBuilder := repo.Cfg.Builder.Select("reviewer_id", "pr_id").
+		From("reviewers")
+
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes, err := (*tx).Query(ctx, queryString, args...)
+	if err != nil {
+		return
+	}
+
+	for rawRes.Next() {
+		var reviewerData entities.PrReviewer
+
+		err = rawRes.Scan(
+			&reviewerData.ReviewerId,
+			&reviewerData.PrId,
+		)
+		if err != nil {
+			return
+		}
+
+		res = append(res, reviewerData)
+	}
+
+	return
+}
+
+func (repo *PrRepository) DeleteReviewer(
+	ctx context.Context,
+	tx *pgx.Tx,
+	prData *entities.PrUnassign,
+) (res int64, err error) {
+	queryBuilder := repo.Cfg.Builder.Delete("reviewers").
+		Where(sq.Eq{"reviewer_id": prData.OldUserId, "pr": prData.PrId})
+
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes, err := (*tx).Exec(ctx, queryString, args...)
+	if err != nil {
+		return
+	}
+	res = rawRes.RowsAffected()
+	return
+}
+
 func (repo *PrRepository) InsertReviewers(
 	ctx context.Context,
 	tx *pgx.Tx,

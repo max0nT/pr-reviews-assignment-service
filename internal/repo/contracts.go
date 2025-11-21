@@ -36,6 +36,16 @@ type (
 	}
 
 	PrRepository interface {
+		SelectPr(
+			context.Context,
+			*pgx.Tx,
+			*entities.PrParams,
+		) ([]entities.PrSimple, error)
+		SelectReviewer(
+			context.Context,
+			*pgx.Tx,
+			entities.PrReviewerParams,
+		) ([]entities.PrReviewer, error)
 		InsertPr(
 			context.Context,
 			*pgx.Tx,
@@ -46,6 +56,11 @@ type (
 			*pgx.Tx,
 			*entities.PrMerge,
 		) (entities.PrSimple, error)
+		DeleteReviewer(
+			context.Context,
+			*pgx.Tx,
+			*entities.PrUnassign,
+		) (int64, error)
 		InsertReviewers(
 			context.Context,
 			*pgx.Tx,

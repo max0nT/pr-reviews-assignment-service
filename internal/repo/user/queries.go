@@ -8,7 +8,7 @@ import (
 	"github.com/max0nT/pr-assign/internal/entities"
 )
 
-func (repo *UserRepository) SelectUsers(
+func (repo *UserRepository) SelectUsers( // nolint: cyclop
 	ctx context.Context,
 	tx *pgx.Tx,
 	userParams *entities.UserParams,
@@ -19,6 +19,9 @@ func (repo *UserRepository) SelectUsers(
 	}
 	if userParams.NotId != "" {
 		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotId})
+	}
+	if len(userParams.NotIdIn) != 0 {
+		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotIdIn})
 	}
 	if userParams.TeamName != "" {
 		queryBuilder = queryBuilder.Where(
@@ -104,6 +107,7 @@ func (repo *UserRepository) InsertUsers(
 		return
 	}
 
+	defer rawRes.Close()
 	for rawRes.Next() {
 		var userData entities.User
 
@@ -119,7 +123,6 @@ func (repo *UserRepository) InsertUsers(
 		res = append(res, userData)
 	}
 
-	rawRes.Close()
 	return
 }
 

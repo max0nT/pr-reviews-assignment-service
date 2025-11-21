@@ -18,7 +18,6 @@ func (tm *TeamManage) AddTeam(
 		IsoLevel: pgx.ReadCommitted,
 	})
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -29,7 +28,7 @@ func (tm *TeamManage) AddTeam(
 			err = &entities.RequestError{
 				Msg: fmt.Sprintf(
 					"Team with %s already exists",
-					insertedTeam.Name,
+					teamData.Name,
 				),
 				StatusCode: http.StatusBadRequest,
 			}
@@ -47,10 +46,10 @@ func (tm *TeamManage) AddTeam(
 		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
-
 	res.Id = insertedTeam.Id
 	res.Name = insertedTeam.Name
 	res.Users = insertedUsers
-	tx.Commit(ctx) // nolint: errcheck, gosec
+
+	err = tx.Commit(ctx)
 	return
 }

@@ -12,5 +12,8 @@ type (
 	PrManage interface {
 		OpenPr(entities.PrCreate) (entities.PrRead, error)
 		MergePr(entities.PrMerge) (entities.PrSimple, error)
+		ReassignUserReviewer(
+			*entities.PrUnassign,
+		) (entities.PrAssign, error)
 	}
 )

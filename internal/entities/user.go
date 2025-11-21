@@ -11,6 +11,7 @@ type UserParams struct {
 	Id       string   `json:"id"`
 	NotId    string   `json:"not_id"`
 	IdIn     []string `json:"id_in"`
+	NotIdIn  []string `json:"not_id_in"`
 	Username string   `json:"username"`
 	TeamName string   `json:"team_name"`
 	IsActive bool     `json:"is_active"`
