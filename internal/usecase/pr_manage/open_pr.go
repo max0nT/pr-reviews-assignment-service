@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/max0nT/pr-assign/internal/entities"
@@ -13,7 +14,7 @@ const (
 	DefaultReviewersCount int = 2
 )
 
-func (pm *PrManage) OpenPr(
+func (pm *PrManage) OpenPr( // nolint: cyclop
 	prData entities.PrCreate,
 ) (res entities.PrRead, err error) {
 	ctx := context.Background()
@@ -37,13 +38,24 @@ func (pm *PrManage) OpenPr(
 		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
+
+	CreatedByValidateErrorMessage := ""
 	if len(createdBy) == 0 {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
+		CreatedByValidateErrorMessage += fmt.Sprintf(
+			"User with id %s does not exist \n",
+			prData.CreatedBy,
+		)
+	}
+	if len(createdBy) != 0 && !createdBy[0].IsActive {
+		CreatedByValidateErrorMessage += fmt.Sprintf(
+			"User with id %s does not exist \n",
+			prData.CreatedBy,
+		)
+	}
+	if CreatedByValidateErrorMessage != "" {
 		err = &entities.RequestError{
-			Msg: fmt.Sprintf(
-				"User with id %s does not exist",
-				prData.CreatedBy,
-			),
+			Msg:        CreatedByValidateErrorMessage,
+			StatusCode: http.StatusBadRequest,
 		}
 		return
 	}
