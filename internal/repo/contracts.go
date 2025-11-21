@@ -28,6 +28,11 @@ type (
 			[]entities.User,
 			string,
 		) ([]entities.User, error)
+		UpdateStatus(
+			context.Context,
+			*pgx.Tx,
+			entities.UserChangeActive,
+		) (entities.User, error)
 	}
 
 	PrRepository interface {

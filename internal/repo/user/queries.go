@@ -71,11 +71,11 @@ func (repo *UserRepository) InsertUsers(
 	users []entities.User,
 	teamName string,
 ) (res []entities.User, err error) {
-	queryBuild := repo.Cfg.Builder.Insert("users").
+	queryBuilder := repo.Cfg.Builder.Insert("users").
 		Columns("id", "username", "team_name", "is_active")
 
 	for _, user := range users {
-		queryBuild = queryBuild.Values(
+		queryBuilder = queryBuilder.Values(
 			user.Id,
 			user.Username,
 			teamName,
@@ -83,14 +83,14 @@ func (repo *UserRepository) InsertUsers(
 		)
 	}
 
-	queryBuild = queryBuild.Suffix(`ON CONFLICT (id) DO UPDATE SET
+	queryBuilder = queryBuilder.Suffix(`ON CONFLICT (id) DO UPDATE SET
 		username = EXCLUDED.username,
 		team_name = EXCLUDED.team_name,
 		is_active = EXCLUDED.is_active`,
 	)
-	queryBuild = queryBuild.Suffix("RETURNING *")
+	queryBuilder = queryBuilder.Suffix("RETURNING *")
 
-	queryString, args, err := queryBuild.ToSql()
+	queryString, args, err := queryBuilder.ToSql()
 	if err != nil {
 		return
 	}
@@ -120,5 +120,35 @@ func (repo *UserRepository) InsertUsers(
 	}
 
 	rawRes.Close()
+	return
+}
+
+func (repo *UserRepository) UpdateStatus(
+	ctx context.Context,
+	tx *pgx.Tx,
+	userData entities.UserChangeActive,
+) (res entities.User, err error) {
+	queryBuilder := repo.Cfg.Builder.Update("users").
+		Set("is_active", userData.IsActive).
+		Where(sq.Eq{"id": userData.Id}).
+		Suffix("RETURNING *")
+
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes := (*tx).QueryRow(
+		ctx,
+		queryString,
+		args...,
+	)
+	err = rawRes.Scan(
+		&res.Id,
+		&res.Username,
+		&res.TeamName,
+		&res.IsActive,
+	)
+
 	return
 }

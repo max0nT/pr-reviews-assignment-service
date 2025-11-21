@@ -50,9 +50,15 @@ func Run(cfg *config.Config) {
 	httpServer := httpserver.New(l)
 	group := httpServer.App.Group("/api/v1/")
 
+	// Team manage
 	group.POST("team/add/", cnt.AddTeam)
+
+	// Pr manage
 	group.POST("pr/open/", cnt.OpenPr)
 	group.PATCH("pr/merge/", cnt.MergePr)
+
+	// User manage
+	group.PATCH("user/change-status-active/", cnt.ChangeUserActive)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 

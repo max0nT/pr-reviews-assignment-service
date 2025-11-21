@@ -16,3 +16,8 @@ type UserParams struct {
 	IsActive bool     `json:"is_active"`
 	Limit    int      `json:"limit"`
 }
+
+type UserChangeActive struct {
+	Id       string `json:"id"`
+	IsActive bool   `json:"is_active"`
+}
