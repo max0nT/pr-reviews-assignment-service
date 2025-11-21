@@ -26,3 +26,7 @@ type PrRead struct {
 	MergedAt  time.Time `json:"merged_at"`
 	Reviewers []User    `json:"reviewers"`
 }
+
+type PrMerge struct {
+	PrId string `json:"pull_request_id" validate:"required"`
+}

@@ -52,6 +52,7 @@ func Run(cfg *config.Config) {
 
 	group.POST("team/add/", cnt.AddTeam)
 	group.POST("pr/open/", cnt.OpenPr)
+	group.PATCH("pr/merge/", cnt.MergePr)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 

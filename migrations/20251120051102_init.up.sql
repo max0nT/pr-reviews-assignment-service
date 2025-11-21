@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS pull_requests (
     is_merged boolean DEFAULT false,
     created_by_id VARCHAR(50) REFERENCES users(id),
     created_at TIMESTAMP DEFAULT now(),
-    merger_at TIMESTAMP
+    merged_at TIMESTAMP
 );
 
 

@@ -36,6 +36,11 @@ type (
 			*pgx.Tx,
 			*entities.PrCreate,
 		) (entities.PrSimple, error)
+		MergePr(
+			context.Context,
+			*pgx.Tx,
+			*entities.PrMerge,
+		) (entities.PrSimple, error)
 		InsertReviewers(
 			context.Context,
 			*pgx.Tx,

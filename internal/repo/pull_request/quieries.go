@@ -2,7 +2,9 @@ package prrepo
 
 import (
 	"context"
+	"time"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/max0nT/pr-assign/internal/entities"
 )
@@ -31,6 +33,35 @@ func (repo *PrRepository) InsertPr(
 		&res.CreatedBy,
 		&res.IsMerged,
 		&res.CreatedAt,
+	)
+
+	return
+}
+
+func (repo *PrRepository) MergePr(
+	ctx context.Context,
+	tx *pgx.Tx,
+	prData *entities.PrMerge,
+) (res entities.PrSimple, err error) {
+	queryBuilder := repo.Cfg.Builder.Update("pull_requests").
+		Set("is_merged", true).
+		Set("merged_at", time.Now()).
+		Where(sq.Eq{"id": prData.PrId}).
+		Suffix("RETURNING *")
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes := (*tx).QueryRow(ctx, queryString, args...)
+
+	err = rawRes.Scan(
+		&res.PrId,
+		&res.PrName,
+		&res.IsMerged,
+		&res.CreatedBy,
+		&res.CreatedAt,
+		&res.MergedAt,
 	)
 
 	return
