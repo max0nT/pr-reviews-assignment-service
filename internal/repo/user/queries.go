@@ -3,9 +3,67 @@ package userrepo
 import (
 	"context"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5"
 	"github.com/max0nT/pr-assign/internal/entities"
 )
+
+func (repo *UserRepository) SelectUsers(
+	ctx context.Context,
+	tx *pgx.Tx,
+	userParams *entities.UserParams,
+) (res []entities.User, err error) {
+	queryBuilder := repo.Cfg.Builder.Select("*").From("users")
+	if userParams.Id != "" {
+		queryBuilder = queryBuilder.Where(sq.Eq{"id": userParams.Id})
+	}
+	if userParams.NotId != "" {
+		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotId})
+	}
+	if userParams.TeamName != "" {
+		queryBuilder = queryBuilder.Where(
+			sq.Eq{"team_name": userParams.TeamName},
+		)
+	}
+	if userParams.IsActive {
+		queryBuilder = queryBuilder.Where(
+			sq.Eq{"is_active": userParams.IsActive},
+		)
+	}
+	if userParams.Limit != 0 {
+		queryBuilder = queryBuilder.Limit(
+			uint64(userParams.Limit), // nolint: gosec
+		)
+	}
+
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes, err := (*tx).Query(ctx, queryString, args...)
+	if err != nil {
+		return
+	}
+
+	for rawRes.Next() {
+		var userData entities.User
+
+		err = rawRes.Scan(
+			&userData.Id,
+			&userData.Username,
+			&userData.TeamName,
+			&userData.IsActive,
+		)
+		if err != nil {
+			return
+		}
+		res = append(res, userData)
+
+	}
+	rawRes.Close()
+	return
+}
 
 func (repo *UserRepository) InsertUsers(
 	ctx context.Context,

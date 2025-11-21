@@ -7,12 +7,18 @@ import (
 
 type Controllers struct {
 	TeamManage usecase.TeamManage
+	PrManage   usecase.PrManage
 	Validator  *validator.Validate
 }
 
-func New(tm usecase.TeamManage, v *validator.Validate) *Controllers {
+func New(
+	tm usecase.TeamManage,
+	pm usecase.PrManage,
+	v *validator.Validate,
+) *Controllers {
 	return &Controllers{
 		TeamManage: tm,
+		PrManage:   pm,
 		Validator:  v,
 	}
 }

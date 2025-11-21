@@ -23,9 +23,10 @@ CREATE TABLE IF NOT EXISTS pull_requests (
 
 
 CREATE TABLE IF NOT EXISTS reviewers (
-    id VARCHAR(50) PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     reviewer_id VARCHAR(50) REFERENCES users(id),
-    pr_id VARCHAR(50) REFERENCES pull_requests(id)
+    pr_id VARCHAR(50) REFERENCES pull_requests(id),
+    UNIQUE (reviewer_id, pr_id)
 );
 
 

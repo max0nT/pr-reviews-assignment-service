@@ -51,7 +51,6 @@ func (tm *TeamManage) AddTeam(
 	res.Id = insertedTeam.Id
 	res.Name = insertedTeam.Name
 	res.Users = insertedUsers
-
 	tx.Commit(ctx) // nolint: errcheck, gosec
 	return
 }

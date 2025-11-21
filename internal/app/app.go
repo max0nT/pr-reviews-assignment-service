@@ -8,8 +8,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/max0nT/pr-assign/internal/controllers"
+	prrepo "github.com/max0nT/pr-assign/internal/repo/pull_request"
 	teamrepo "github.com/max0nT/pr-assign/internal/repo/team"
 	userrepo "github.com/max0nT/pr-assign/internal/repo/user"
+	prmanage "github.com/max0nT/pr-assign/internal/usecase/pr_manage"
 	teammanage "github.com/max0nT/pr-assign/internal/usecase/team_manage"
 
 	"github.com/max0nT/pr-assign/config"
@@ -26,17 +28,30 @@ func Run(cfg *config.Config) {
 	}
 	defer pg.Close()
 
+	userRepo := userrepo.New(pg)
+	teamRepo := teamrepo.New(pg)
+	prRepo := prrepo.New(pg)
+
 	teamManage := teammanage.New(
 		pg,
-		userrepo.New(pg),
-		teamrepo.New(pg),
+		userRepo,
+		teamRepo,
 	)
-	cnt := controllers.New(teamManage, validator.New())
+	prManage := prmanage.New(
+		pg,
+		userRepo,
+		teamRepo,
+		prRepo,
+	)
+
+	cnt := controllers.New(teamManage, prManage, validator.New())
 
 	// Init http server
 	httpServer := httpserver.New(l)
 	group := httpServer.App.Group("/api/v1/")
+
 	group.POST("team/add/", cnt.AddTeam)
+	group.POST("pr/open/", cnt.OpenPr)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 
