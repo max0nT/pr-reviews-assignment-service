@@ -19,6 +19,5 @@ fmt:
     @golangci-lint fmt
 
 docker-build:
-	@pack build maxtet1703/pr-assignment-service \
-	 --builder paketobuildpacks/builder-jammy-buildpackless-static \
-	 --buildpack paketo-buildpacks/go
+	@pack build maxtet1703/pr-assignment-service --builder paketobuildpacks/builder-jammy-full \
+	--buildpack paketo-buildpacks/go
