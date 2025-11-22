@@ -92,6 +92,7 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 		&entities.UserParams{
 			NotIdIn:  prohibitForAssign,
 			TeamName: pr[0].CreatedByData.TeamName,
+			IsActive: true,
 			Limit:    1,
 		},
 	)
