@@ -8,18 +8,17 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// GetUsers @Summary Get user list
+// GetUsersStats @Summary Get user stats list
 //
 //	@Tags		Team manage
 //	@Param		request	query		entities.UserParams	false	"User search parameters"
-//	@Success	200		{array}		entities.User
+//	@Success	200		{array}		entities.UserStats
 //	@Failure	400		{object}	entities.RequestError
-//	@Failure	404		{object}	entities.RequestError
 //	@Failure	500		{objects}	entities.RequestError
-//	@Router		/api/v1/user/ [get]
+//	@Router		/api/v1/user/stats/ [get].
 //
-// Get User list.
-func (cnt *Controllers) GetUsers(ctx *gin.Context) {
+// Get User PR statistic.
+func (cnt *Controllers) GetUsersStats(ctx *gin.Context) {
 	var userParams entities.UserParams
 	err := ctx.BindQuery(&userParams)
 	if err != nil {
@@ -32,7 +31,7 @@ func (cnt *Controllers) GetUsers(ctx *gin.Context) {
 		)
 		return
 	}
-	res, err := cnt.TeamManage.GetUsers(&userParams)
+	res, err := cnt.TeamManage.GetUsersStats(&userParams)
 	if err != nil {
 		log.Print("Error during users get: ", err.Error())
 		cnt.HandleError(ctx, err)

@@ -14,34 +14,11 @@ func (repo *UserRepository) SelectUsers( // nolint: cyclop
 	userParams *entities.UserParams,
 ) (res []entities.User, err error) {
 	queryBuilder := repo.Cfg.Builder.Select("*").From("users")
-	if userParams.Id != "" {
-		queryBuilder = queryBuilder.Where(sq.Eq{"id": userParams.Id})
-	}
-	if len(userParams.IdIn) != 0 {
-		queryBuilder = queryBuilder.Where(sq.Eq{"id": userParams.IdIn})
-	}
-	if userParams.NotId != "" {
-		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotId})
-	}
-	if len(userParams.NotIdIn) != 0 {
-		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotIdIn})
-	}
-	if userParams.TeamName != "" {
-		queryBuilder = queryBuilder.Where(
-			sq.Eq{"team_name": userParams.TeamName},
-		)
-	}
-	if userParams.IsActive {
-		queryBuilder = queryBuilder.Where(
-			sq.Eq{"is_active": userParams.IsActive},
-		)
-	}
-	if userParams.Limit != 0 {
-		queryBuilder = queryBuilder.Limit(
-			uint64(userParams.Limit), // nolint: gosec
-		)
-	}
-
+	queryBuilder = repo.ProcessUserQueryParams(
+		queryBuilder,
+		*userParams,
+		false,
+	)
 	queryString, args, err := queryBuilder.ToSql()
 	if err != nil {
 		return
@@ -67,6 +44,97 @@ func (repo *UserRepository) SelectUsers( // nolint: cyclop
 	}
 	rawRes.Close()
 	return
+}
+
+func (repo *UserRepository) SelectUsersStats(
+	ctx context.Context,
+	tx *pgx.Tx,
+	userParams *entities.UserParams,
+) (res []entities.UserStats, err error) {
+	queryBuilder := repo.Cfg.Builder.Select(
+		"users.id",
+		"users.username",
+		"users.team_name",
+		"users.is_active",
+		"COUNT(pull_requests.created_by_id)",
+		"COUNT(reviewers.reviewer_id)",
+	).From("users").
+		LeftJoin("reviewers ON users.id = reviewers.reviewer_id").
+		LeftJoin("pull_requests ON users.id = pull_requests.created_by_id").
+		GroupBy("users.id")
+
+	queryBuilder = repo.ProcessUserQueryParams(queryBuilder, *userParams, true)
+	queryString, args, err := queryBuilder.ToSql()
+	if err != nil {
+		return
+	}
+
+	rawRes, err := (*tx).Query(ctx, queryString, args...)
+	if err != nil {
+		return
+	}
+	for rawRes.Next() {
+		var userData entities.UserStats
+
+		err = rawRes.Scan(
+			&userData.Id,
+			&userData.Username,
+			&userData.TeamName,
+			&userData.IsActive,
+			&userData.PrCount,
+			&userData.RwCount,
+		)
+		if err != nil {
+			return
+		}
+		res = append(res, userData)
+
+	}
+	rawRes.Close()
+	return
+}
+
+func (repo *UserRepository) ProcessUserQueryParams(
+	queryBuilder sq.SelectBuilder,
+	userParams entities.UserParams,
+	isHaving bool,
+) sq.SelectBuilder {
+	eqFilter := sq.Eq{}
+	notEqFilter := sq.NotEq{}
+
+	if userParams.Id != "" {
+		eqFilter["users.id"] = userParams.Id
+	}
+	if len(userParams.IdIn) != 0 {
+		eqFilter["users.id"] = userParams.IdIn
+	}
+	if userParams.NotId != "" {
+		notEqFilter["users.id"] = userParams.NotId
+	}
+	if len(userParams.NotIdIn) != 0 {
+		notEqFilter["users.id"] = userParams.NotIdIn
+	}
+	if userParams.TeamName != "" {
+		eqFilter["users.team_name"] = userParams.TeamName
+	}
+	if userParams.IsActive {
+		eqFilter["users.is_active"] = userParams.IsActive
+	}
+	if userParams.Limit != 0 {
+		queryBuilder = queryBuilder.Limit(
+			uint64(userParams.Limit), // nolint: gosec
+		)
+	}
+
+	if isHaving {
+		queryBuilder = queryBuilder.Having(eqFilter)
+		queryBuilder = queryBuilder.Having(notEqFilter)
+	} else {
+		queryBuilder = queryBuilder.Where(eqFilter)
+		queryBuilder = queryBuilder.Where(notEqFilter)
+	}
+
+	return queryBuilder
 }
 
 func (repo *UserRepository) InsertUsers(

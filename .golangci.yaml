@@ -6,6 +6,7 @@ formatters:
     - goimports # checks if the code and import statements are formatted according to the 'goimports' command
     - golines # checks if code is formatted, and fixes long lines  settings:
     - gofmt # checks if the code is formatted according to 'gofmt' command
+    - swaggo
 
   settings:
     goimports:

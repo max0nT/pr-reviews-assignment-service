@@ -141,6 +141,21 @@ definitions:
       is_active:
         type: boolean
     type: object
+  entities.UserStats:
+    properties:
+      id:
+        type: string
+      is_active:
+        type: boolean
+      pr_count:
+        type: integer
+      rw_count:
+        type: integer
+      team_name:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: Swagger API for service which allow to manager processes in PRs
@@ -172,9 +187,8 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Get team by name
       tags:
-      - Pr manage
+      - PR manage
   /api/v1/pr/merge/:
     patch:
       parameters:
@@ -201,7 +215,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Mar PR as merged
       tags:
       - PR manage
   /api/v1/pr/open/:
@@ -230,7 +243,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Create PR and assign random reviewers
       tags:
       - PR manage
   /api/v1/pr/reassign/:
@@ -259,7 +271,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Change one reviewer to random another one
       tags:
       - PR manage
   /api/v1/team/:
@@ -282,7 +293,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Get team by name
       tags:
       - Team manage
   /api/v1/team/add/:
@@ -311,7 +321,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Add team with members
       tags:
       - Team manage
   /api/v1/user/:
@@ -366,7 +375,6 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Get user list
       tags:
       - Team manage
   /api/v1/user/change-status-active/:
@@ -395,7 +403,56 @@ paths:
           description: Internal Server Error
           schema:
             type: objects
-      summary: Change user active status
+      tags:
+      - Team manage
+  /api/v1/user/stats/:
+    get:
+      parameters:
+      - in: query
+        name: id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: id_in
+        type: array
+      - in: query
+        name: is_active
+        type: boolean
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: not_id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: not_id_in
+        type: array
+      - in: query
+        name: team_name
+        type: string
+      - in: query
+        name: username
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.UserStats'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
       tags:
       - Team manage
 swagger: "2.0"

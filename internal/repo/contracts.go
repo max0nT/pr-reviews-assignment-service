@@ -27,6 +27,11 @@ type (
 			*pgx.Tx,
 			*entities.UserParams,
 		) ([]entities.User, error)
+		SelectUsersStats(
+			context.Context,
+			*pgx.Tx,
+			*entities.UserParams,
+		) ([]entities.UserStats, error)
 		InsertUsers(
 			context.Context,
 			*pgx.Tx,

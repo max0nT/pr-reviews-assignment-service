@@ -8,13 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// @Summary Get team by name
-// @Tags Pr manage
-// @Param request query entities.PrParams false "PR search parameters"
-// @Success 200 {array} entities.PrSimple
-// @Failure 500 {objects} entities.RequestError
-// @Router /api/v1/pr/ [get]
-
+// GetPr @Summary Get team by name
+//
+//	@Tags		PR manage
+//	@Param		request	query		entities.PrParams	false	"PR search parameters"
+//	@Success	200		{array}		entities.PrSimple
+//	@Failure	500		{objects}	entities.RequestError
+//	@Router		/api/v1/pr/ [get]
+//
+// Get PR list by search params.
 func (c *Controllers) GetPr(ctx *gin.Context) {
 	var prParams entities.PrParams
 	err := ctx.BindQuery(&prParams)

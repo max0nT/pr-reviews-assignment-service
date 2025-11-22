@@ -18,9 +18,8 @@ const docTemplate = `{
         "/api/v1/pr/": {
             "get": {
                 "tags": [
-                    "Pr manage"
+                    "PR manage"
                 ],
-                "summary": "Get team by name",
                 "parameters": [
                     {
                         "type": "string",
@@ -67,7 +66,6 @@ const docTemplate = `{
                 "tags": [
                     "PR manage"
                 ],
-                "summary": "Mar PR as merged",
                 "parameters": [
                     {
                         "description": "PR merge parameters",
@@ -112,7 +110,6 @@ const docTemplate = `{
                 "tags": [
                     "PR manage"
                 ],
-                "summary": "Create PR and assign random reviewers",
                 "parameters": [
                     {
                         "description": "PR create parameters",
@@ -157,7 +154,6 @@ const docTemplate = `{
                 "tags": [
                     "PR manage"
                 ],
-                "summary": "Change one reviewer to random another one",
                 "parameters": [
                     {
                         "description": "Reviewer unassign parameters",
@@ -202,7 +198,6 @@ const docTemplate = `{
                 "tags": [
                     "Team manage"
                 ],
-                "summary": "Get team by name",
                 "parameters": [
                     {
                         "type": "string",
@@ -238,7 +233,6 @@ const docTemplate = `{
                 "tags": [
                     "Team manage"
                 ],
-                "summary": "Add team with members",
                 "parameters": [
                     {
                         "description": "Team add parameters",
@@ -283,7 +277,6 @@ const docTemplate = `{
                 "tags": [
                     "Team manage"
                 ],
-                "summary": "Get user list",
                 "parameters": [
                     {
                         "type": "string",
@@ -370,7 +363,6 @@ const docTemplate = `{
                 "tags": [
                     "Team manage"
                 ],
-                "summary": "Change user active status",
                 "parameters": [
                     {
                         "description": "User Change active status parameters",
@@ -397,6 +389,86 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/entities.RequestError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "objects"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/stats/": {
+            "get": {
+                "tags": [
+                    "Team manage"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "id_in",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "is_active",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "not_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "not_id_in",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "team_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.UserStats"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/entities.RequestError"
                         }
@@ -617,6 +689,29 @@ const docTemplate = `{
                 },
                 "is_active": {
                     "type": "boolean"
+                }
+            }
+        },
+        "entities.UserStats": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "pr_count": {
+                    "type": "integer"
+                },
+                "rw_count": {
+                    "type": "integer"
+                },
+                "team_name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

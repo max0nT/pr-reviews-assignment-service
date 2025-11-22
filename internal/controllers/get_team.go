@@ -8,14 +8,16 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// @Summary Get team by name
-// @Tags Team manage
-// @Param request query entities.TeamGetParams false "Team search parameters"
-// @Success 200 {object} entities.TeamRead
-// @Failure 404 {object} entities.RequestError
-// @Failure 500 {objects} entities.RequestError
-// @Router /api/v1/team/ [get]
-
+// GetTeam @Summary Get team by name
+//
+//	@Tags		Team manage
+//	@Param		request	query		entities.TeamGetParams	false	"Team search parameters"
+//	@Success	200		{object}	entities.TeamRead
+//	@Failure	404		{object}	entities.RequestError
+//	@Failure	500		{objects}	entities.RequestError
+//	@Router		/api/v1/team/ [get]
+//
+// Get Team Using search params (optional).
 func (c *Controllers) GetTeam(ctx *gin.Context) {
 	var teamParams entities.TeamGetParams
 	if err := ctx.BindQuery(&teamParams); err != nil {

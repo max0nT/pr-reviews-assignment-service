@@ -24,8 +24,8 @@ import (
 	"github.com/max0nT/pr-assign/pkg/postgres"
 )
 
-// @title Swagger PR service
-// @description Swagger API for service which allow to manager processes in PRs
+//	@title			Swagger PR service
+//	@description	Swagger API for service which allow to manager processes in PRs
 
 func Run(cfg *config.Config) {
 	l := logger.New("debug")
@@ -75,6 +75,7 @@ func Run(cfg *config.Config) {
 	// User manage
 	group.PATCH("user/change-status-active/", cnt.ChangeUserActive)
 	group.GET("user/", cnt.GetUsers)
+	group.GET("/user/stats/", cnt.GetUsersStats)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 

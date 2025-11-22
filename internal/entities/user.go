@@ -7,6 +7,15 @@ type User struct {
 	IsActive bool   `json:"is_active" validate:"required"`
 }
 
+type UserStats struct {
+	Id       string `json:"id"`
+	Username string `json:"username"`
+	TeamName string `json:"team_name"`
+	IsActive bool   `json:"is_active"`
+	PrCount  int    `json:"pr_count"`
+	RwCount  int    `json:"rw_count"`
+}
+
 type UserParams struct {
 	Id       string   `form:"id"`
 	NotId    string   `form:"not_id"`
