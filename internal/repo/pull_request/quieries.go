@@ -72,7 +72,18 @@ func (repo *PrRepository) SelectPr(
 	tx *pgx.Tx,
 	prData *entities.PrParams,
 ) (res []entities.PrSimple, err error) {
-	queryBuilder := repo.Cfg.Builder.Select("*").From("pull_requests")
+	queryBuilder := repo.Cfg.Builder.Select(
+		"pull_requests.id",
+		"pull_requests.name",
+		"pull_requests.is_merged",
+		"pull_requests.created_by_id",
+		"pull_requests.created_at",
+		"pull_requests.merged_at",
+		"users.id",
+		"users.username",
+		"users.team_name",
+		"users.is_active",
+	).From("pull_requests")
 	if prData.PrId != "" {
 		queryBuilder = queryBuilder.Where(
 			sq.Eq{"pull_requests.id": prData.PrId},
@@ -85,6 +96,11 @@ func (repo *PrRepository) SelectPr(
 	}
 	if prData.IsMerged {
 		queryBuilder = queryBuilder.Where(sq.Eq{"is_merged": prData.IsMerged})
+	}
+	if prData.ReviewerId != "" {
+		queryBuilder = queryBuilder.LeftJoin(
+			"reviewers ON pull_requests.id = reviewers.pr_id",
+		).Where(sq.Eq{"reviewers.reviewer_id": prData.ReviewerId})
 	}
 	queryBuilder = queryBuilder.Join(
 		"users ON pull_requests.created_by_id = users.id",

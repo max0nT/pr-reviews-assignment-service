@@ -55,6 +55,7 @@ func Run(cfg *config.Config) {
 	group.GET("team/", cnt.GetTeam)
 
 	// Pr manage
+	group.GET("pr/", cnt.GetPr)
 	group.POST("pr/open/", cnt.OpenPr)
 	group.PATCH("pr/merge/", cnt.MergePr)
 	group.PATCH("pr/reassign/", cnt.ReassignReviewer)

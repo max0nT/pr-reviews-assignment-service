@@ -29,10 +29,10 @@ type PrRead struct {
 }
 
 type PrParams struct {
-	PrId         string
-	CreatedBy    string
-	ReviewerIdIn []string
-	IsMerged     bool
+	PrId       string `form:"pr_id"`
+	CreatedBy  string `form:"created_by_id"`
+	ReviewerId string `form:"reviewer_id"`
+	IsMerged   bool   `form:"is_merged"`
 }
 
 type PrReviewerParams struct {

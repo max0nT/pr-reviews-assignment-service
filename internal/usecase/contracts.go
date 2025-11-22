@@ -17,5 +17,6 @@ type (
 		ReassignUserReviewer(
 			*entities.PrUnassign,
 		) (entities.PrAssign, error)
+		GetPr(*entities.PrParams) ([]entities.PrSimple, error)
 	}
 )
