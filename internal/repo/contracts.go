@@ -13,7 +13,7 @@ type (
 			context.Context,
 			*pgx.Tx,
 			string,
-		) (entities.ItemSimple, error)
+		) (entities.TeamSimple, error)
 	}
 
 	UserRepository interface {

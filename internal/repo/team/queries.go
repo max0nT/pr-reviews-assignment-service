@@ -7,11 +7,11 @@ import (
 	"github.com/max0nT/pr-assign/internal/entities"
 )
 
-func (repo *ItemRepository) InsertTeam(
+func (repo *TeamRepository) InsertTeam(
 	ctx context.Context,
 	tx *pgx.Tx,
 	teamName string,
-) (res entities.ItemSimple, err error) {
+) (res entities.TeamSimple, err error) {
 	queryBuild := repo.Cfg.Builder.Insert("teams").
 		Columns("name").
 		Values(teamName).

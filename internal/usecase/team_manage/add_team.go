@@ -11,8 +11,8 @@ import (
 )
 
 func (tm *TeamManage) AddTeam(
-	teamData entities.ItemCreate,
-) (res entities.ItemRead, err error) {
+	teamData entities.TeamCreate,
+) (res entities.TeamRead, err error) {
 	ctx := context.Background()
 	tx, err := tm.Cfg.Pool.BeginTx(ctx, pgx.TxOptions{
 		IsoLevel: pgx.ReadCommitted,

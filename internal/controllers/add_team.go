@@ -9,7 +9,7 @@ import (
 )
 
 func (c *Controllers) AddTeam(ctx *gin.Context) {
-	var validatedData entities.ItemCreate
+	var validatedData entities.TeamCreate
 	if err := c.ParseJson(ctx, &validatedData); err != nil {
 		ctx.JSON(
 			http.StatusBadRequest,

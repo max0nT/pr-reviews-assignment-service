@@ -4,7 +4,7 @@ import "github.com/max0nT/pr-assign/internal/entities"
 
 type (
 	TeamManage interface {
-		AddTeam(entities.ItemCreate) (entities.ItemRead, error)
+		AddTeam(entities.TeamCreate) (entities.TeamRead, error)
 		ChangeUserActive(
 			*entities.UserChangeActive,
 		) (entities.User, error)
