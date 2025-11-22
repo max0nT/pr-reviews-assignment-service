@@ -52,6 +52,7 @@ func Run(cfg *config.Config) {
 
 	// Team manage
 	group.POST("team/add/", cnt.AddTeam)
+	group.GET("team/", cnt.GetTeam)
 
 	// Pr manage
 	group.POST("pr/open/", cnt.OpenPr)

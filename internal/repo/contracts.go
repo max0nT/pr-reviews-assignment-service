@@ -9,6 +9,11 @@ import (
 
 type (
 	TeamRepository interface {
+		SelectTeam(
+			context.Context,
+			*pgx.Tx,
+			*entities.TeamGetParams,
+		) (entities.TeamSimple, error)
 		InsertTeam(
 			context.Context,
 			*pgx.Tx,

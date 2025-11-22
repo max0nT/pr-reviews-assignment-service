@@ -9,6 +9,7 @@ type (
 			*entities.UserChangeActive,
 		) (entities.User, error)
 		GetUsers(*entities.UserParams) ([]entities.User, error)
+		GetTeam(*entities.TeamGetParams) (entities.TeamRead, error)
 	}
 	PrManage interface {
 		OpenPr(entities.PrCreate) (entities.PrRead, error)

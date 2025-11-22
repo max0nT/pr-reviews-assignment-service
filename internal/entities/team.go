@@ -15,3 +15,7 @@ type TeamSimple struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
+
+type TeamGetParams struct {
+	TeamName string `form:"team_name" validate:"required"`
+}
