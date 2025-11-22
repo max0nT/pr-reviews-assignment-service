@@ -8,6 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @Summary Get user list
+// @Tags Team manage
+// @Param request query entities.UserParams false "User search parameters"
+// @Success 200 {array} entities.User
+// @Failure 400 {object} entities.RequestError
+// @Failure 404 {object} entities.RequestError
+// @Failure 500 {objects} entities.RequestError
+// @Router /api/v1/user/ [get]
+
 func (cnt *Controllers) GetUsers(ctx *gin.Context) {
 	var userParams entities.UserParams
 	err := ctx.BindQuery(&userParams)

@@ -13,12 +13,19 @@ import (
 	userrepo "github.com/max0nT/pr-assign/internal/repo/user"
 	prmanage "github.com/max0nT/pr-assign/internal/usecase/pr_manage"
 	teammanage "github.com/max0nT/pr-assign/internal/usecase/team_manage"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/max0nT/pr-assign/internal/openapi"
 
 	"github.com/max0nT/pr-assign/config"
 	"github.com/max0nT/pr-assign/pkg/httpserver"
 	"github.com/max0nT/pr-assign/pkg/logger"
 	"github.com/max0nT/pr-assign/pkg/postgres"
 )
+
+// @title Swagger PR service
+// @description Swagger API for service which allow to manager processes in PRs
 
 func Run(cfg *config.Config) {
 	l := logger.New("debug")
@@ -48,6 +55,11 @@ func Run(cfg *config.Config) {
 
 	// Init http server
 	httpServer := httpserver.New(l)
+	httpServer.App.GET(
+		"swagger/*any",
+		ginSwagger.WrapHandler(swaggerFiles.Handler),
+	)
+
 	group := httpServer.App.Group("/api/v1/")
 
 	// Team manage

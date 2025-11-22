@@ -1,0 +1,401 @@
+definitions:
+  entities.PrAssign:
+    properties:
+      new_reviewer_id:
+        type: string
+      pull_request_id:
+        type: string
+    required:
+    - new_reviewer_id
+    - pull_request_id
+    type: object
+  entities.PrCreate:
+    properties:
+      created_by_id:
+        maxLength: 20
+        minLength: 3
+        type: string
+      pull_request_id:
+        maxLength: 20
+        minLength: 3
+        type: string
+      pull_request_name:
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - created_by_id
+    - pull_request_id
+    - pull_request_name
+    type: object
+  entities.PrMerge:
+    properties:
+      pull_request_id:
+        type: string
+    required:
+    - pull_request_id
+    type: object
+  entities.PrRead:
+    properties:
+      created_at:
+        type: string
+      created_by_id:
+        type: string
+      is_merged:
+        type: boolean
+      merged_at:
+        type: string
+      pull_request_id:
+        type: string
+      pull_request_name:
+        type: string
+      reviewers:
+        items:
+          $ref: '#/definitions/entities.User'
+        type: array
+    type: object
+  entities.PrSimple:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        $ref: '#/definitions/entities.User'
+      created_by_id:
+        type: string
+      is_merged:
+        type: boolean
+      merged_at:
+        type: string
+      pull_request_id:
+        type: string
+      pull_request_name:
+        type: string
+    type: object
+  entities.PrUnassign:
+    properties:
+      old_reviewer_id:
+        type: string
+      pull_request_id:
+        type: string
+    required:
+    - old_reviewer_id
+    - pull_request_id
+    type: object
+  entities.RequestError:
+    properties:
+      msg:
+        type: string
+      statusCode:
+        type: integer
+    type: object
+  entities.TeamCreate:
+    properties:
+      name:
+        maxLength: 20
+        minLength: 3
+        type: string
+      users:
+        items:
+          $ref: '#/definitions/entities.User'
+        maxItems: 20
+        minItems: 1
+        type: array
+    required:
+    - name
+    - users
+    type: object
+  entities.TeamRead:
+    properties:
+      id:
+        type: string
+      members:
+        items:
+          $ref: '#/definitions/entities.User'
+        type: array
+      name:
+        type: string
+    type: object
+  entities.User:
+    properties:
+      id:
+        maxLength: 5
+        minLength: 3
+        type: string
+      is_active:
+        type: boolean
+      team_name:
+        type: string
+      username:
+        maxLength: 20
+        minLength: 3
+        type: string
+    required:
+    - id
+    - is_active
+    - username
+    type: object
+  entities.UserChangeActive:
+    properties:
+      id:
+        type: string
+      is_active:
+        type: boolean
+    type: object
+info:
+  contact: {}
+  description: Swagger API for service which allow to manager processes in PRs
+  title: Swagger PR service
+paths:
+  /api/v1/pr/:
+    get:
+      parameters:
+      - in: query
+        name: created_by_id
+        type: string
+      - in: query
+        name: is_merged
+        type: boolean
+      - in: query
+        name: pr_id
+        type: string
+      - in: query
+        name: reviewer_id
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.PrSimple'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Get team by name
+      tags:
+      - Pr manage
+  /api/v1/pr/merge/:
+    patch:
+      parameters:
+      - description: PR merge parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.PrMerge'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.PrSimple'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Mar PR as merged
+      tags:
+      - PR manage
+  /api/v1/pr/open/:
+    post:
+      parameters:
+      - description: PR create parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.PrCreate'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entities.PrRead'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Create PR and assign random reviewers
+      tags:
+      - PR manage
+  /api/v1/pr/reassign/:
+    patch:
+      parameters:
+      - description: Reviewer unassign parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.PrUnassign'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.PrAssign'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Change one reviewer to random another one
+      tags:
+      - PR manage
+  /api/v1/team/:
+    get:
+      parameters:
+      - in: query
+        name: team_name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.TeamRead'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Get team by name
+      tags:
+      - Team manage
+  /api/v1/team/add/:
+    post:
+      parameters:
+      - description: Team add parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.TeamCreate'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entities.TeamRead'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Add team with members
+      tags:
+      - Team manage
+  /api/v1/user/:
+    get:
+      parameters:
+      - in: query
+        name: id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: id_in
+        type: array
+      - in: query
+        name: is_active
+        type: boolean
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: not_id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: not_id_in
+        type: array
+      - in: query
+        name: team_name
+        type: string
+      - in: query
+        name: username
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Get user list
+      tags:
+      - Team manage
+  /api/v1/user/change-status-active/:
+    patch:
+      parameters:
+      - description: User Change active status parameters
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UserChangeActive'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/entities.RequestError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: objects
+      summary: Change user active status
+      tags:
+      - Team manage
+swagger: "2.0"

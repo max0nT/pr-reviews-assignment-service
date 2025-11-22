@@ -8,6 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @Summary Mar PR as merged
+// @Tags PR manage
+// @Param request body entities.PrMerge true "PR merge parameters"
+// @Success 200 {object} entities.PrSimple
+// @Failure 400 {object} entities.RequestError
+// @Failure 404 {object} entities.RequestError
+// @Failure 500 {objects} entities.RequestError
+// @Router /api/v1/pr/merge/ [patch]
+
 func (c *Controllers) MergePr(ctx *gin.Context) {
 	var validatedData entities.PrMerge
 	if err := c.ParseJson(ctx, &validatedData); err != nil {

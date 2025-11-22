@@ -8,6 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @Summary Change user active status
+// @Tags Team manage
+// @Param request body entities.UserChangeActive true "User Change active status parameters"
+// @Success 200 {object} entities.User
+// @Failure 400 {object} entities.RequestError
+// @Failure 404 {object} entities.RequestError
+// @Failure 500 {objects} entities.RequestError
+// @Router /api/v1/user/change-status-active/ [patch]
+
 func (c *Controllers) ChangeUserActive(ctx *gin.Context) {
 	var validatedData entities.UserChangeActive
 

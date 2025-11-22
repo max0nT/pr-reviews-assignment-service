@@ -8,6 +8,15 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+// @Summary Change one reviewer to random another one
+// @Tags PR manage
+// @Param request body entities.PrUnassign true "Reviewer unassign parameters"
+// @Success 200 {object} entities.PrAssign
+// @Failure 400 {object} entities.RequestError
+// @Failure 404 {object} entities.RequestError
+// @Failure 500 {objects} entities.RequestError
+// @Router /api/v1/pr/reassign/ [patch]
+
 func (c *Controllers) ReassignReviewer(ctx *gin.Context) {
 	var validatedData entities.PrUnassign
 	if err := c.ParseJson(ctx, &validatedData); err != nil {

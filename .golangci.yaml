@@ -27,6 +27,7 @@ linters:
     paths:
       - .github
       - migrations
+      - internal/openapi
 
   enable:
     - asasalint # checks for pass []any as any in variadic func(...any)
