@@ -10,8 +10,8 @@ run:
     go run cmd/main.go
 
 migrate-run *args:
-    echo $POSTGRES_URI
-    @migrate -path ./migrations -database $POSTGRES_URI {{args}}
+    echo $DATABASE_URL
+    @migrate -path ./migrations -database $DATABASE_URL {{args}}
 
 lint:
     @golangci-lint run

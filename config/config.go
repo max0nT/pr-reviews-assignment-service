@@ -3,7 +3,7 @@ package config
 import "github.com/spf13/viper"
 
 type Config struct {
-	PostgresUri string `mapstructure:"POSTGRES_URI"`
+	PostgresUri string `mapstructure:"DATABASE_URL"`
 }
 
 func NewConfig() (cfg *Config, err error) {

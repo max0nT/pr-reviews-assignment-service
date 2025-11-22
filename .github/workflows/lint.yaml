@@ -57,7 +57,7 @@ jobs:
 
       - name: Push image
         run:
-          docker push maxtet1703/pr-assignment-service
+          docker push maxtet1703/pr-assignment-service:latest
 
       - id: image-clear
         name: remove all images
