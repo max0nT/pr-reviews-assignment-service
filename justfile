@@ -26,4 +26,7 @@ open-api *args:
     docker run --rm -v $(pwd):/code ghcr.io/swaggo/swag:latest {{args}}
 
 update-spec:
-    @just open-api init -g ./internal/app/app.go -o ./internal/openapi
+    @just open-api init  \
+    -g ./internal/app/app.go \
+     -o ./internal/openapi \
+     --outputTypes go,yaml
