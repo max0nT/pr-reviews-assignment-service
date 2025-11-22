@@ -20,10 +20,10 @@ func (tm *TeamManage) AddTeam(
 	if err != nil {
 		return
 	}
+	defer tm.Cfg.CloseTxForFail(ctx, &tx, err)
 
 	insertedTeam, err := tm.TeamRepo.InsertTeam(ctx, &tx, teamData.Name)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		if errors.Is(err, pgx.ErrNoRows) {
 			err = &entities.RequestError{
 				Msg: fmt.Sprintf(
@@ -43,7 +43,6 @@ func (tm *TeamManage) AddTeam(
 		insertedTeam.Name,
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 	res.Id = insertedTeam.Id

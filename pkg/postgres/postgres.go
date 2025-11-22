@@ -8,13 +8,14 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 const (
-	_defaultMaxPoolSize  = 1
+	_defaultMaxPoolSize  = 4
 	_defaultConnAttempts = 10
-	_defaultConnTimeout  = time.Second
+	_defaultConnTimeout  = 3 * time.Second
 )
 
 // Postgres -.
@@ -79,5 +80,11 @@ func New(url string) (*Postgres, error) {
 func (p *Postgres) Close() {
 	if p.Pool != nil {
 		p.Pool.Close()
+	}
+}
+
+func (p *Postgres) CloseTxForFail(ctx context.Context, tx *pgx.Tx, err error) {
+	if err != nil {
+		(*tx).Rollback(ctx) // nolint: errcheck, gosec
 	}
 }

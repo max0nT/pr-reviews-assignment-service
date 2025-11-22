@@ -106,11 +106,13 @@ func (repo *UserRepository) InsertUsers(
 	if err != nil {
 		return
 	}
+	if err = rawRes.Err(); err != nil {
+		return
+	}
 
 	defer rawRes.Close()
 	for rawRes.Next() {
 		var userData entities.User
-
 		err = rawRes.Scan(
 			&userData.Id,
 			&userData.Username,
@@ -122,7 +124,6 @@ func (repo *UserRepository) InsertUsers(
 		}
 		res = append(res, userData)
 	}
-
 	return
 }
 

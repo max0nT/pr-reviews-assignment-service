@@ -74,7 +74,9 @@ func (repo *PrRepository) SelectPr(
 ) (res []entities.PrSimple, err error) {
 	queryBuilder := repo.Cfg.Builder.Select("*").From("pull_requests")
 	if prData.PrId != "" {
-		queryBuilder = queryBuilder.Where(sq.Eq{"id": prData.PrId})
+		queryBuilder = queryBuilder.Where(
+			sq.Eq{"pull_requests.id": prData.PrId},
+		)
 	}
 	if prData.CreatedBy != "" {
 		queryBuilder = queryBuilder.Where(
@@ -165,7 +167,7 @@ func (repo *PrRepository) DeleteReviewer(
 	prData *entities.PrUnassign,
 ) (res int64, err error) {
 	queryBuilder := repo.Cfg.Builder.Delete("reviewers").
-		Where(sq.Eq{"reviewer_id": prData.OldUserId, "pr": prData.PrId})
+		Where(sq.Eq{"reviewer_id": prData.OldUserId, "pr_id": prData.PrId})
 
 	queryString, args, err := queryBuilder.ToSql()
 	if err != nil {

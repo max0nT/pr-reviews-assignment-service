@@ -17,9 +17,9 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 		IsoLevel: pgx.ReadCommitted,
 	})
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
+	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
 
 	pr, err := pm.PrRepo.SelectPr(
 		ctx,
@@ -27,7 +27,6 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 		&entities.PrParams{PrId: reviewerData.PrId},
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -45,7 +44,6 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 		)
 	}
 	if prValidationError != "" {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		err = &entities.RequestError{
 			Msg:        prValidationError,
 			StatusCode: http.StatusBadRequest,
@@ -55,11 +53,9 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 
 	rmCount, err := pm.PrRepo.DeleteReviewer(ctx, &tx, reviewerData)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 	if rmCount == 0 {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		err = &entities.RequestError{
 			Msg: fmt.Sprintf(
 				"There isn't reviewer with id %s for pr %s",
@@ -84,13 +80,12 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 	prohibitForAssign = append(
 		prohibitForAssign,
 		pr[0].CreatedBy,
-		reviewerData.PrId,
+		reviewerData.OldUserId,
 	)
 
 	for _, reviewerData := range reviewers {
 		prohibitForAssign = append(prohibitForAssign, reviewerData.ReviewerId)
 	}
-
 	newReviewer, err := pm.UserRepo.SelectUsers(
 		ctx,
 		&tx,
@@ -101,7 +96,6 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 		},
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 	if len(newReviewer) == 0 {
@@ -114,13 +108,12 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 
 	err = pm.PrRepo.InsertReviewers(ctx, &tx, &pr[0], &newReviewer)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
-	} else {
-		tx.Commit(ctx) // nolint: errcheck, gosec
+		return
 	}
 
 	res.NewUserId = newReviewer[0].Id
 	res.PrId = pr[0].PrId
 
+	err = tx.Commit(ctx)
 	return
 }

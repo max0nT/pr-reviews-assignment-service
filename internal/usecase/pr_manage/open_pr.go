@@ -28,6 +28,7 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	if err != nil {
 		return
 	}
+	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
 
 	createdBy, err := pm.UserRepo.SelectUsers(
 		ctx,
@@ -35,7 +36,6 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 		&entities.UserParams{Id: prData.CreatedBy, IsActive: true},
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -75,7 +75,6 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 			}
 
 		}
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -90,11 +89,9 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 		},
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 	if len(reviewers) == 0 {
-		tx.Commit(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -105,7 +102,6 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 		&reviewers,
 	)
 	if err != nil {
-		tx.Rollback(ctx) // nolint: errcheck, gosec
 		return
 	}
 
@@ -114,9 +110,9 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	res.CreatedBy = insertedPr.CreatedBy
 	res.CreatedAt = insertedPr.CreatedAt
 	res.IsMerged = insertedPr.IsMerged
-	res.MergedAt = insertedPr.MergedAt
+	res.MergedAt = *insertedPr.MergedAt
 	res.Reviewers = reviewers
 
-	err = tx.Commit(ctx) // nolint: errcheck, gosec
+	err = tx.Commit(ctx)
 	return
 }

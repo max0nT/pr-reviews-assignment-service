@@ -9,13 +9,13 @@ type PrCreate struct {
 }
 
 type PrSimple struct {
-	PrId          string    `json:"pull_request_id"`
-	PrName        string    `json:"pull_request_name"`
-	CreatedBy     string    `json:"created_by_id"`
-	IsMerged      bool      `json:"is_merged"`
-	CreatedAt     time.Time `json:"created_at"`
-	MergedAt      time.Time `json:"merged_at"`
-	CreatedByData User      `json:"created_by"`
+	PrId          string     `json:"pull_request_id"`
+	PrName        string     `json:"pull_request_name"`
+	CreatedBy     string     `json:"created_by_id"`
+	IsMerged      bool       `json:"is_merged"`
+	CreatedAt     time.Time  `json:"created_at"`
+	MergedAt      *time.Time `json:"merged_at"`
+	CreatedByData User       `json:"created_by"`
 }
 
 type PrRead struct {
