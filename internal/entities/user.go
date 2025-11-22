@@ -1,8 +1,8 @@
 package entities
 
 type User struct {
-	Id       string `json:"id"        validate:"required,min=3,max=5"`
-	Username string `json:"username"  validate:"required,min=3,max=20"`
+	Id       string `json:"id"        validate:"required,min=3,max=50"`
+	Username string `json:"username"  validate:"required,min=3,max=50"`
 	TeamName string `json:"team_name"`
 	IsActive bool   `json:"is_active" validate:"required"`
 }

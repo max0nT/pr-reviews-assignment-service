@@ -3,9 +3,9 @@ package entities
 import "time"
 
 type PrCreate struct {
-	PrId      string `json:"pull_request_id"   validate:"required,min=3,max=20"`
-	PrName    string `json:"pull_request_name" validate:"required,min=3,max=20"`
-	CreatedBy string `json:"created_by_id"     validate:"required,min=3,max=20"`
+	PrId      string `json:"pull_request_id"   validate:"required,min=3,max=50"`
+	PrName    string `json:"pull_request_name" validate:"required,min=3,max=50"`
+	CreatedBy string `json:"created_by_id"     validate:"required,min=3,max=50"`
 }
 
 type PrSimple struct {

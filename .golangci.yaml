@@ -29,6 +29,7 @@ linters:
       - .github
       - migrations
       - internal/openapi
+      - performance
 
   enable:
     - asasalint # checks for pass []any as any in variadic func(...any)

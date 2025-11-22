@@ -1,8 +1,8 @@
 package entities
 
 type TeamCreate struct {
-	Name  string `json:"name"  validate:"required,min=3,max=20"`
-	Users []User `json:"users" validate:"required,min=1,max=20"`
+	Name  string `json:"name"  validate:"required,min=3,max=50"`
+	Users []User `json:"users" validate:"required,min=1,max=50"`
 }
 
 type TeamRead struct {
