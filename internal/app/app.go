@@ -60,6 +60,7 @@ func Run(cfg *config.Config) {
 
 	// User manage
 	group.PATCH("user/change-status-active/", cnt.ChangeUserActive)
+	group.GET("user/", cnt.GetUsers)
 
 	httpServer.App.Run() // nolint: errcheck, gosec
 

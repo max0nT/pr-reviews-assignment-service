@@ -17,6 +17,9 @@ func (repo *UserRepository) SelectUsers( // nolint: cyclop
 	if userParams.Id != "" {
 		queryBuilder = queryBuilder.Where(sq.Eq{"id": userParams.Id})
 	}
+	if len(userParams.IdIn) != 0 {
+		queryBuilder = queryBuilder.Where(sq.Eq{"id": userParams.IdIn})
+	}
 	if userParams.NotId != "" {
 		queryBuilder = queryBuilder.Where(sq.NotEq{"id": userParams.NotId})
 	}
@@ -43,12 +46,10 @@ func (repo *UserRepository) SelectUsers( // nolint: cyclop
 	if err != nil {
 		return
 	}
-
 	rawRes, err := (*tx).Query(ctx, queryString, args...)
 	if err != nil {
 		return
 	}
-
 	for rawRes.Next() {
 		var userData entities.User
 

@@ -8,14 +8,14 @@ type User struct {
 }
 
 type UserParams struct {
-	Id       string   `json:"id"`
-	NotId    string   `json:"not_id"`
-	IdIn     []string `json:"id_in"`
-	NotIdIn  []string `json:"not_id_in"`
-	Username string   `json:"username"`
-	TeamName string   `json:"team_name"`
-	IsActive bool     `json:"is_active"`
-	Limit    int      `json:"limit"`
+	Id       string   `form:"id"`
+	NotId    string   `form:"not_id"`
+	IdIn     []string `form:"id_in"`
+	NotIdIn  []string `form:"not_id_in"`
+	Username string   `form:"username"`
+	TeamName string   `form:"team_name"`
+	IsActive bool     `form:"is_active"`
+	Limit    int      `form:"limit"`
 }
 
 type UserChangeActive struct {
