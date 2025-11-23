@@ -66,6 +66,9 @@ var PrOpenData entities.PrCreate = entities.PrCreate{
 	PrName:    "The first Pr name",
 	CreatedBy: "uid1",
 }
+var PrMergeData entities.PrMerge = entities.PrMerge{
+	PrId: "pr1",
+}
 
 func TestTeamAdd(t *testing.T) {
 	var body io.Reader
@@ -257,5 +260,45 @@ func TestExistingPrOpen(t *testing.T) {
 			PrOpenData.PrId,
 		),
 	)
+
+}
+
+func TestMergePr(t *testing.T) {
+	var body io.Reader
+	rawBody, err := json.Marshal(PrOpenData)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to parse team data before create: %s",
+			err.Error(),
+		)
+		return
+	}
+
+	body = bytes.NewReader(rawBody)
+	path := "/api/v1/pr/merge/"
+	response, err := MakeRequest(
+		context.Background(),
+		path,
+		http.MethodPatch,
+		body,
+	)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to make request to PATCH '%s`: %s",
+			path,
+			err.Error(),
+		)
+
+	}
+
+	require.Equal(t, response.StatusCode, http.StatusOK)
+
+	var responseData entities.PrSimple
+	if err := json.NewDecoder(response.Body).Decode(&responseData); err != nil {
+		t.Fatalf("Failed to decode response body: %v", err)
+	}
+
+	require.Equal(t, responseData.PrId, PrMergeData.PrId)
+	require.Equal(t, responseData.IsMerged, true)
 
 }

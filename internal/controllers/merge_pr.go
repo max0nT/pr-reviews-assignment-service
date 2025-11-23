@@ -49,5 +49,5 @@ func (c *Controllers) MergePr(ctx *gin.Context) {
 		log.Print("Error during team add: ", err.Error())
 		return
 	}
-	ctx.JSON(http.StatusCreated, res)
+	ctx.JSON(http.StatusOK, res)
 }
