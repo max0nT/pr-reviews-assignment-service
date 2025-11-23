@@ -9,4 +9,4 @@ exclude = [
 ]
 [[ io.buildpacks.build.env ]]
   name="BP_KEEP_FILES"
-  value=".env"
+  value=".env:.env.testing"

@@ -1,6 +1,10 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"os"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	PostgresUri string `mapstructure:"DATABASE_URL"`
@@ -9,7 +13,12 @@ type Config struct {
 func NewConfig() (cfg *Config, err error) {
 
 	viper.AddConfigPath(".")
-	viper.SetConfigName(".env")
+	if os.Getenv("ENVIRONMENT") == "testing" {
+		viper.SetConfigName(".env.testing")
+	} else {
+		viper.SetConfigName(".env")
+	}
+
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
