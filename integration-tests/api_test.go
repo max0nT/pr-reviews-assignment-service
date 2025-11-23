@@ -48,13 +48,23 @@ var TeamAddData entities.TeamCreate = entities.TeamCreate{
 			Username: "username2",
 			IsActive: true,
 		},
-
+		{
+			Id:       "uid3",
+			Username: "username3",
+			IsActive: true,
+		},
 		{
 			Id:       "uid4",
-			Username: "username5",
+			Username: "username4",
 			IsActive: true,
 		},
 	},
+}
+
+var PrOpenData entities.PrCreate = entities.PrCreate{
+	PrId:      "pr1",
+	PrName:    "The first Pr name",
+	CreatedBy: "uid1",
 }
 
 func TestTeamAdd(t *testing.T) {
@@ -155,6 +165,96 @@ func TestExistingTeamAdd(t *testing.T) {
 		fmt.Sprintf(
 			"Team with %s already exists",
 			TeamAddData.Name,
+		),
+	)
+
+}
+
+func TestPrOpen(t *testing.T) {
+	var body io.Reader
+	rawBody, err := json.Marshal(PrOpenData)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to parse team data before create: %s",
+			err.Error(),
+		)
+		return
+	}
+
+	body = bytes.NewReader(rawBody)
+	path := "/api/v1/pr/open/"
+	response, err := MakeRequest(
+		context.Background(),
+		path,
+		http.MethodPost,
+		body,
+	)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to make request to POST '%s`: %s",
+			path,
+			err.Error(),
+		)
+
+	}
+
+	require.Equal(t, response.StatusCode, http.StatusCreated)
+
+	var responseData entities.PrRead
+	if err := json.NewDecoder(response.Body).Decode(&responseData); err != nil {
+		t.Fatalf("Failed to decode response body: %v", err)
+	}
+
+	require.Equal(t, responseData.PrName, PrOpenData.PrName)
+	require.Equal(t, len(responseData.Reviewers), 2)
+
+	for _, reviewer := range responseData.Reviewers {
+		require.Equal(t, reviewer.IsActive, true)
+	}
+
+}
+
+func TestExistingPrOpen(t *testing.T) {
+	var body io.Reader
+	rawBody, err := json.Marshal(PrOpenData)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to parse team data before create: %s",
+			err.Error(),
+		)
+		return
+	}
+
+	body = bytes.NewReader(rawBody)
+	path := "/api/v1/pr/open/"
+	response, err := MakeRequest(
+		context.Background(),
+		path,
+		http.MethodPost,
+		body,
+	)
+
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to make request to POST '%s`: %s",
+			path,
+			err.Error(),
+		)
+		return
+	}
+	require.Equal(t, response.StatusCode, http.StatusBadRequest)
+
+	var ErrorData controllers.ErrorMessage
+	if err := json.NewDecoder(response.Body).Decode(&ErrorData); err != nil {
+		t.Fatalf("Failed to decode response body: %v", err)
+	}
+
+	require.Equal(
+		t,
+		ErrorData.Message,
+		fmt.Sprintf(
+			"Pr with id %s already exist",
+			PrOpenData.PrId,
 		),
 	)
 
