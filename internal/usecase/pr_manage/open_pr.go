@@ -72,6 +72,7 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 					"Pr with id %s already exist",
 					prData.PrId,
 				),
+				StatusCode: http.StatusBadRequest,
 			}
 
 		}
@@ -92,6 +93,7 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 		return
 	}
 	if len(reviewers) == 0 {
+		res.BuildFrom(&insertedPr, &reviewers)
 		return
 	}
 
@@ -104,13 +106,6 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	if err != nil {
 		return
 	}
-	res.PrId = insertedPr.PrId
-	res.PrName = insertedPr.PrName
-	res.CreatedBy = insertedPr.CreatedBy
-	res.CreatedAt = insertedPr.CreatedAt
-	res.IsMerged = insertedPr.IsMerged
-	res.MergedAt = *insertedPr.MergedAt
-	res.Reviewers = reviewers
-
+	res.BuildFrom(&insertedPr, &reviewers)
 	return
 }

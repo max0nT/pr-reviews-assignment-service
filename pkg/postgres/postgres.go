@@ -88,7 +88,7 @@ func (p *Postgres) CloseTx(
 	tx *pgx.Tx,
 	err *error,
 ) {
-	if err != nil {
+	if *err != nil {
 		(*tx).Rollback(ctx) // nolint: errcheck, gosec
 	} else {
 		cErr := (*tx).Commit(ctx) // nolint: staticcheck

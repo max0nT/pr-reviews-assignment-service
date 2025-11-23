@@ -19,13 +19,23 @@ type PrSimple struct {
 }
 
 type PrRead struct {
-	PrId      string    `json:"pull_request_id"`
-	PrName    string    `json:"pull_request_name"`
-	CreatedBy string    `json:"created_by_id"`
-	IsMerged  bool      `json:"is_merged"`
-	CreatedAt time.Time `json:"created_at"`
-	MergedAt  time.Time `json:"merged_at"`
-	Reviewers []User    `json:"reviewers"`
+	PrId      string     `json:"pull_request_id"`
+	PrName    string     `json:"pull_request_name"`
+	CreatedBy string     `json:"created_by_id"`
+	IsMerged  bool       `json:"is_merged"`
+	CreatedAt time.Time  `json:"created_at"`
+	MergedAt  *time.Time `json:"merged_at"`
+	Reviewers []User     `json:"reviewers"`
+}
+
+func (pr *PrRead) BuildFrom(prData *PrSimple, members *[]User) {
+	pr.PrId = prData.PrId
+	pr.PrName = prData.PrName
+	pr.CreatedBy = prData.CreatedBy
+	pr.IsMerged = prData.IsMerged
+	pr.CreatedAt = prData.CreatedAt
+	pr.MergedAt = prData.MergedAt
+	pr.Reviewers = *members
 }
 
 type PrParams struct {
