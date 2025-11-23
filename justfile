@@ -9,6 +9,13 @@ copy-settings:
 run:
     go run cmd/main.go
 
+test:
+    go clean -testcache
+    docker compose stop
+    docker compose -f compose.test.yaml down -v
+    docker compose -f compose.test.yaml up -d
+    go test -v ./integration-tests
+
 migrate-run *args:
     echo $DATABASE_URL
     @migrate -path ./migrations -database $DATABASE_URL {{args}}
