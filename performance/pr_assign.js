@@ -1,15 +1,19 @@
 import http from "k6/http";
 import { check, sleep } from "k6";
 
+import { htmlReport } from "https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js";
+import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
+
 // Test configuration
 export const options = {
   thresholds: {
     http_req_duration: ["p(99) < 50"],
   },
   stages: [
-    { duration: "10s", target: 15 },
+    { duration: "10s", target: 50 },
   ],
 };
+
 
 export function setup() {
   const timestamp = Date.now();
@@ -51,8 +55,8 @@ export default function(data) {
 
   let payload = {
     created_by_id: data.members[0].id,
-    pull_request_id: `pr_id_for_${data.members[0].id}`,
-    pull_request_name: `pr_name_for_${data.members[0].id}`,
+    pull_request_id: `pr_id_for_${data.members[0].id}_${Date.now()}`,
+    pull_request_name: `pr_name_for_${data.members[0].id}__${Date.now()}`,
   };
 
   const params = {
@@ -62,9 +66,9 @@ export default function(data) {
   };
 
   const response = http.post("http://0.0.0.0:8080/api/v1/pr/open/", JSON.stringify(payload), params);
-
+  console.log(response.status)
   check(response, {
-    'status is 200': (r) => r.status === 201,
+    'status is 201': (r) => r.status === 201,
   });
 
   sleep(2);

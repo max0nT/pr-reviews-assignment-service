@@ -7,7 +7,7 @@ export const options = {
     http_req_duration: ["p(99) < 50"],
   },
   stages: [
-    { duration: "10s", target: 10 },
+    { duration: "10s", target: 50 },
   ],
 };
 
