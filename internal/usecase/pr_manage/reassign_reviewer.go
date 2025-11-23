@@ -19,7 +19,7 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 	if err != nil {
 		return
 	}
-	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer pm.Cfg.CloseTx(ctx, &tx, &err)
 
 	pr, err := pm.PrRepo.SelectPr(
 		ctx,
@@ -115,6 +115,5 @@ func (pm *PrManage) ReassignUserReviewer( // nolint: cyclop
 	res.NewUserId = newReviewer[0].Id
 	res.PrId = pr[0].PrId
 
-	err = tx.Commit(ctx)
 	return
 }

@@ -20,7 +20,7 @@ func (tm *TeamManage) AddTeam(
 	if err != nil {
 		return
 	}
-	defer tm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer tm.Cfg.CloseTx(ctx, &tx, &err)
 
 	insertedTeam, err := tm.TeamRepo.InsertTeam(ctx, &tx, teamData.Name)
 	if err != nil {
@@ -49,6 +49,5 @@ func (tm *TeamManage) AddTeam(
 	res.Name = insertedTeam.Name
 	res.Users = insertedUsers
 
-	err = tx.Commit(ctx)
 	return
 }

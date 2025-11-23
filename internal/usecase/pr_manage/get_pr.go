@@ -17,13 +17,9 @@ func (pm *PrManage) GetPr(
 	if err != nil {
 		return
 	}
-	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer pm.Cfg.CloseTx(ctx, &tx, &err)
 
 	res, err = pm.PrRepo.SelectPr(ctx, &tx, prParams)
-
-	if err == nil {
-		err = tx.Commit(ctx)
-	}
 
 	return
 

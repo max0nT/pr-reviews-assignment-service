@@ -21,7 +21,7 @@ func (tm *TeamManage) GetTeam(
 	if err != nil {
 		return
 	}
-	defer tm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer tm.Cfg.CloseTx(ctx, &tx, &err)
 
 	selectedTeam, err := tm.TeamRepo.SelectTeam(ctx, &tx, teamData)
 	if err != nil {
@@ -49,8 +49,6 @@ func (tm *TeamManage) GetTeam(
 	res.Id = selectedTeam.Id
 	res.Name = selectedTeam.Name
 	res.Users = selectedUsers
-
-	err = tx.Commit(ctx)
 
 	return
 }

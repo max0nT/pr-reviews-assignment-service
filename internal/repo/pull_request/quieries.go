@@ -26,7 +26,6 @@ func (repo *PrRepository) InsertPr(
 	}
 
 	resRaw := (*tx).QueryRow(ctx, queryString, args...)
-
 	err = resRaw.Scan(
 		&res.PrId,
 		&res.PrName,
@@ -173,7 +172,7 @@ func (repo *PrRepository) SelectReviewer(
 
 		res = append(res, reviewerData)
 	}
-
+	rawRes.Close()
 	return
 }
 

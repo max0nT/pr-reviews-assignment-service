@@ -20,7 +20,7 @@ func (pm *PrManage) MergePr(
 	if err != nil {
 		return
 	}
-	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer pm.Cfg.CloseTx(ctx, &tx, &err)
 
 	res, err = pm.PrRepo.MergePr(
 		ctx,
@@ -39,7 +39,6 @@ func (pm *PrManage) MergePr(
 		}
 		return
 	}
-	err = tx.Commit(ctx)
 
 	return
 }

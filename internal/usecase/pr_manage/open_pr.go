@@ -28,7 +28,7 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	if err != nil {
 		return
 	}
-	defer pm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer pm.Cfg.CloseTx(ctx, &tx, &err)
 
 	createdBy, err := pm.UserRepo.SelectUsers(
 		ctx,
@@ -104,7 +104,6 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	if err != nil {
 		return
 	}
-
 	res.PrId = insertedPr.PrId
 	res.PrName = insertedPr.PrName
 	res.CreatedBy = insertedPr.CreatedBy
@@ -113,6 +112,5 @@ func (pm *PrManage) OpenPr( // nolint: cyclop
 	res.MergedAt = *insertedPr.MergedAt
 	res.Reviewers = reviewers
 
-	err = tx.Commit(ctx)
 	return
 }

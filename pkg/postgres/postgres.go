@@ -83,8 +83,15 @@ func (p *Postgres) Close() {
 	}
 }
 
-func (p *Postgres) CloseTxForFail(ctx context.Context, tx *pgx.Tx, err error) {
+func (p *Postgres) CloseTx(
+	ctx context.Context,
+	tx *pgx.Tx,
+	err *error,
+) {
 	if err != nil {
 		(*tx).Rollback(ctx) // nolint: errcheck, gosec
+	} else {
+		cErr := (*tx).Commit(ctx) // nolint: staticcheck
+		err = &cErr               // nolint: ineffassign, wastedassign
 	}
 }

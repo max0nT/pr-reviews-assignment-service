@@ -20,7 +20,7 @@ func (tm *TeamManage) ChangeUserActive(
 	if err != nil {
 		return
 	}
-	defer tm.Cfg.CloseTxForFail(ctx, &tx, err)
+	defer tm.Cfg.CloseTx(ctx, &tx, &err)
 
 	res, err = tm.UserRepo.UpdateStatus(ctx, &tx, *userData)
 	if err != nil {
@@ -36,6 +36,5 @@ func (tm *TeamManage) ChangeUserActive(
 		return
 	}
 
-	err = tx.Commit(ctx)
 	return
 }
