@@ -1,6 +1,8 @@
+version: '3.8'
+
 services:
   postgres_test:
-    image: postgres:latest
+    image: postgres:15-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -11,33 +13,36 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 15
+      start_period: 60s
 
-  migrator_test: &migrator
+  migrator_test:
     image: migrate/migrate:4
     depends_on:
       postgres_test:
         condition: service_healthy
     volumes:
-      - ./migrations:/migrations:ro
-    env_file: .env
-    command: ["-path=/migrations", "-database=postgresql://postgres:postgres@postgres_test:5432/postgres?sslmode=disable", "up"]
-    restart: on-failure
+      - ./migrations:/migrations
+    command:
+      - "-path=/migrations"
+      - "-database=postgresql://postgres:postgres@postgres_test:5432/postgres?sslmode=disable"
+      - "up"
+    restart: "no"
 
-  app: &app
+  app:
     image: maxtet1703/pr-assignment-service:latest
     ports:
       - "8080:8080"
     environment:
       ENVIRONMENT: testing
     depends_on:
+      postgres_test:
+        condition: service_healthy
       migrator_test:
         condition: service_completed_successfully
-
 
 volumes:
   pgtestdata:

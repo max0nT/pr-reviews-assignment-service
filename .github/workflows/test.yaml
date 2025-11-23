@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-   build:
+   test:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo
@@ -31,6 +31,10 @@ jobs:
         run: |
           go mod download
 
+      - name: Clear test cache
+        run: |
+          go clean -testcache
+
       - id: setup-buildpack-tools
         name: install tools for build pack
         uses: buildpacks/github-actions/setup-tools@v5.1.0
@@ -44,13 +48,24 @@ jobs:
         with:
           just-version: 1.43.0
 
+      - name: copy local settings
+        run : just copy-settings
+
       - name: Build with Pack
         run: |
           just docker-build
 
+      - name: Run service
+        run: |
+          docker compose -f compose.test.yaml up -d
+
       - name: Run test
         run: |
-          just test
+          go test -v ./integration-tests
+
+      - name: Drop service
+        run: |
+          docker compose -f compose.test.yaml down -v
 
       - id: image-clear
         name: remove all images

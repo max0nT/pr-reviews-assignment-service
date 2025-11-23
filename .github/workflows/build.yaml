@@ -8,7 +8,7 @@ on:
 jobs:
    build:
     runs-on: ubuntu-latest
-    needs: [lint, test]
+    needs: test
     steps:
       - name: checkout repo
         uses: actions/checkout@main
