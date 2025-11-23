@@ -4,7 +4,7 @@
 
 - To use service just run
 ```bash
-cp .env.example .env && docker compose -d
+cp .env.example .env && docker compose up -d
 ```
 - After that you may test app by using swagger which is available on that [link](http://0.0.0.0:8080/swagger/index.html)
 
