@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"testing"
 
+	"github.com/max0nT/pr-assign/internal/controllers"
 	"github.com/max0nT/pr-assign/internal/entities"
 	"github.com/stretchr/testify/require"
 )
@@ -57,7 +59,6 @@ var TeamAddData entities.TeamCreate = entities.TeamCreate{
 
 func TestTeamAdd(t *testing.T) {
 	var body io.Reader
-
 	rawBody, err := json.Marshal(TeamAddData)
 	if err != nil {
 		log.Fatalf(
@@ -112,4 +113,49 @@ func TestTeamAdd(t *testing.T) {
 
 	require.Equal(t, responseData.Name, TeamAddData.Name)
 	require.Equal(t, len(responseData.Users), len(TeamAddData.Users))
+}
+
+func TestExistingTeamAdd(t *testing.T) {
+	var body io.Reader
+	rawBody, err := json.Marshal(TeamAddData)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to parse team data before create: %s",
+			err.Error(),
+		)
+		return
+	}
+
+	body = bytes.NewReader(rawBody)
+	path := "/api/v1/team/add/"
+	response, err := MakeRequest(
+		context.Background(),
+		path,
+		http.MethodPost,
+		body,
+	)
+
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to make request to POST '/api/v1/team/add/`: %s",
+			err.Error(),
+		)
+		return
+	}
+	require.Equal(t, response.StatusCode, http.StatusBadRequest)
+
+	var ErrorData controllers.ErrorMessage
+	if err := json.NewDecoder(response.Body).Decode(&ErrorData); err != nil {
+		t.Fatalf("Failed to decode response body: %v", err)
+	}
+
+	require.Equal(
+		t,
+		ErrorData.Message,
+		fmt.Sprintf(
+			"Team with %s already exists",
+			TeamAddData.Name,
+		),
+	)
+
 }
