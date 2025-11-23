@@ -35,6 +35,16 @@ func MakeRequest(
 	return
 }
 
+var InactiveUser entities.User = entities.User{
+	Id:       "uid5",
+	Username: "username5",
+	IsActive: false,
+}
+
+var ChangeUserActiveStatusData entities.UserChangeActive = entities.UserChangeActive{
+	Id:       InactiveUser.Id,
+	IsActive: !InactiveUser.IsActive,
+}
 var TeamAddData entities.TeamCreate = entities.TeamCreate{
 	Name: "TeamName1",
 	Users: []entities.User{
@@ -58,9 +68,9 @@ var TeamAddData entities.TeamCreate = entities.TeamCreate{
 			Username: "username4",
 			IsActive: true,
 		},
+		InactiveUser,
 	},
 }
-
 var PrOpenData entities.PrCreate = entities.PrCreate{
 	PrId:      "pr1",
 	PrName:    "The first Pr name",
@@ -301,4 +311,43 @@ func TestMergePr(t *testing.T) {
 	require.Equal(t, responseData.PrId, PrMergeData.PrId)
 	require.Equal(t, responseData.IsMerged, true)
 
+}
+
+func TestChangeUserActive(t *testing.T) {
+	var body io.Reader
+	rawBody, err := json.Marshal(ChangeUserActiveStatusData)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to parse team data before create: %s",
+			err.Error(),
+		)
+		return
+	}
+
+	body = bytes.NewReader(rawBody)
+	path := "/api/v1/user/change-status-active/"
+	response, err := MakeRequest(
+		context.Background(),
+		path,
+		http.MethodPatch,
+		body,
+	)
+	if err != nil {
+		log.Fatalf(
+			"Integration tests: Failed to make request to PATCH '%s`: %s",
+			path,
+			err.Error(),
+		)
+
+	}
+
+	require.Equal(t, response.StatusCode, http.StatusOK)
+
+	var responseData entities.User
+	if err := json.NewDecoder(response.Body).Decode(&responseData); err != nil {
+		t.Fatalf("Failed to decode response body: %v", err)
+	}
+
+	require.Equal(t, responseData.Id, InactiveUser.Id)
+	require.Equal(t, responseData.IsActive, !InactiveUser.IsActive)
 }

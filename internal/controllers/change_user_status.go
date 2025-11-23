@@ -50,6 +50,6 @@ func (c *Controllers) ChangeUserActive(ctx *gin.Context) {
 		log.Print("Error during user change status: ", err.Error())
 		return
 	}
-	ctx.JSON(http.StatusCreated, res)
+	ctx.JSON(http.StatusOK, res)
 
 }
