@@ -7,7 +7,7 @@
 
 ## Setup and run
 
-- To use service just run
+- To use service clone project and just run
 ```bash
 docker compose up -d
 ```
