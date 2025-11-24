@@ -31,6 +31,15 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
+      - id: setup-buildpack-tools
+        name: install tools for build pack
+        uses: buildpacks/github-actions/setup-tools@v5.1.0
+
+      - id: setup-pack
+        name: install client for build pack
+        uses: buildpacks/github-actions/setup-pack@v5.1.0
+
+
       - name: Cache Go modules
         uses: actions/cache@v3
         with:
@@ -48,14 +57,6 @@ jobs:
       - name: Clear test cache
         run: |
           go clean -testcache
-
-      - id: setup-buildpack-tools
-        name: install tools for build pack
-        uses: buildpacks/github-actions/setup-tools@v5.1.0
-
-      - id: setup-pack
-        name: install client for build pack
-        uses: buildpacks/github-actions/setup-pack@v5.1.0
 
       - name: Install just
         uses: extractions/setup-just@v3
@@ -88,6 +89,14 @@ jobs:
       - name: checkout repo
         uses: actions/checkout@main
 
+      - id: setup-buildpack-tools
+        name: install tools for build pack
+        uses: buildpacks/github-actions/setup-tools@v5.1.0
+
+      - id: setup-pack
+        name: install client for build pack
+        uses: buildpacks/github-actions/setup-pack@v5.1.0
+
       - name: Install just
         uses: extractions/setup-just@v3
         with:
@@ -101,7 +110,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
 
       - name: Build with Pack
         run: |
